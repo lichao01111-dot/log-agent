@@ -1,0 +1,90 @@
+"""Application-layer ports for executing domain commands."""
+
+from log_agent.application.configuration import (
+    AgentConfiguration,
+    ConfigurationCompatibilityError,
+)
+from log_agent.application.executor import CommandExecutor, InvalidCommand
+from log_agent.application.knowledge_projection import (
+    KnowledgeProjection,
+    KnowledgeProjectionError,
+    KnowledgeProjector,
+    ProjectionBudget,
+    ProjectionVisibilityPolicy,
+    ReasoningStage,
+    TaskSignals,
+)
+from log_agent.application.model_ports import (
+    ModelFinishReason,
+    ModelTraceContext,
+    ReasoningTextCategory,
+    ReasoningTextSanitizationError,
+    ReasoningTextSanitizer,
+    StructuredModelClient,
+    StructuredModelRequest,
+    StructuredModelResponse,
+)
+from log_agent.application.ports import (
+    LogSearchPort,
+    PortError,
+    PortProtocolError,
+    PortUnavailable,
+    ReasoningPort,
+    SearchRequest,
+    SearchResult,
+    VerificationAssessment,
+)
+from log_agent.application.query_security import (
+    LogSource,
+    QueryLiteral,
+    QueryOperation,
+    QueryPlan,
+    QueryPlanCompiler,
+    QueryPolicyError,
+    QueryPolicyGate,
+    SafeQueryPipeline,
+    ScopePolicy,
+    ScopePolicyRegistry,
+)
+from log_agent.application.runner import InvestigationRunner
+
+__all__ = [
+    "AgentConfiguration",
+    "CommandExecutor",
+    "ConfigurationCompatibilityError",
+    "InvalidCommand",
+    "InvestigationRunner",
+    "KnowledgeProjection",
+    "KnowledgeProjectionError",
+    "KnowledgeProjector",
+    "LogSource",
+    "LogSearchPort",
+    "ModelFinishReason",
+    "ModelTraceContext",
+    "PortError",
+    "PortProtocolError",
+    "PortUnavailable",
+    "ProjectionBudget",
+    "ProjectionVisibilityPolicy",
+    "QueryOperation",
+    "QueryLiteral",
+    "QueryPlan",
+    "QueryPlanCompiler",
+    "QueryPolicyError",
+    "QueryPolicyGate",
+    "ReasoningPort",
+    "ReasoningStage",
+    "ReasoningTextCategory",
+    "ReasoningTextSanitizationError",
+    "ReasoningTextSanitizer",
+    "SearchRequest",
+    "SearchResult",
+    "SafeQueryPipeline",
+    "ScopePolicy",
+    "ScopePolicyRegistry",
+    "StructuredModelClient",
+    "StructuredModelRequest",
+    "StructuredModelResponse",
+    "TaskSignals",
+    "VerificationAssessment",
+]

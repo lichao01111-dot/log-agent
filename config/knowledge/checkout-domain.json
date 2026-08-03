@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "bundle_id": "checkout-domain",
+  "revision": "2026-08-02.1",
+  "system_id": "checkout",
+  "scope_refs": [
+    "checkout-prod"
+  ],
+  "components": [
+    {
+      "id": "checkout-api",
+      "name": "Checkout API",
+      "kind": "internal",
+      "description": "Coordinates checkout requests and calls the payment dependency."
+    },
+    {
+      "id": "payment-service",
+      "name": "Payment Service",
+      "kind": "dependency",
+      "description": "Authorizes payments requested by the checkout API."
+    }
+  ],
+  "fields": [
+    {
+      "id": "checkout.error-code",
+      "component_id": "checkout-api",
+      "semantic_type": "error_code",
+      "description": "Stable application error code emitted for a failed checkout request."
+    },
+    {
+      "id": "checkout.trace-id",
+      "component_id": "checkout-api",
+      "semantic_type": "trace_id",
+      "description": "Correlation identifier shared by checkout and downstream calls."
+    },
+    {
+      "id": "payment.duration",
+      "component_id": "payment-service",
+      "semantic_type": "duration",
+      "description": "Elapsed time observed for a payment authorization request."
+    }
+  ],
+  "error_codes": [
+    {
+      "id": "checkout.payment-timeout",
+      "code": "PAYMENT_TIMEOUT",
+      "component_id": "checkout-api",
+      "meaning": "Checkout did not receive a payment response before its timeout."
+    }
+  ],
+  "dependencies": [
+    {
+      "id": "checkout-to-payment",
+      "caller_component_id": "checkout-api",
+      "callee_component_id": "payment-service",
+      "description": "Checkout synchronously requests payment authorization."
+    }
+  ],
+  "known_failures": [
+    {
+      "id": "payment-timeout",
+      "title": "Payment dependency timeout",
+      "candidate_causes": [
+        "Payment latency exceeded the checkout timeout budget.",
+        "Connectivity between checkout and payment degraded."
+      ],
+      "required_evidence": [
+        "PAYMENT_TIMEOUT events increased during the incident window.",
+        "Payment latency or timeout samples occurred before checkout failures."
+      ],
+      "related_error_code_ids": [
+        "checkout.payment-timeout"
+      ],
+      "related_component_ids": [
+        "checkout-api",
+        "payment-service"
+      ]
+    }
+  ]
+}
