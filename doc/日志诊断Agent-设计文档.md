@@ -1,7 +1,7 @@
 # 日志诊断 Agent — 设计文档
 
 > 版本:v0.2(可测试架构阶段)
-> 状态:领域内核、Fake 闭环、安全查询计划、领域知识、知识投影和结构化推理边界已实现；生产脱敏、真实模型与 MCP 契约仍待补全
+> 状态:领域内核、进程内 WorkingMemory、Fake 闭环、安全查询计划、领域知识、知识投影和结构化推理边界已实现；记忆持久化、生产脱敏、真实模型与 MCP 契约仍待补全
 > 范围:单个 IT 系统的日志诊断；目标工具后端为现有 Splunk MCP，但真实 wire contract 尚未提供
 
 ---
@@ -68,6 +68,8 @@
 
 每轮更新此笔记,agent 的推理基于笔记而非原始历史。领域层只接受摘要、Fact 与 EvidenceRef；真实 Adapter 接入前仍须实现并验收摘要化与脱敏边界，原始 JSON 不得直接进入模型上下文。
 
+这里必须区分“完整调查记忆”和“一次模型调用的上下文”。模型上下文只能是从 WorkingMemory 按阶段筛选、限额、脱敏并对证据做临时别名化之后得到的只读视图。持久化、跨进程恢复和长期记忆当前均未实现，详细边界见[第五课：上下文与记忆的设计](05-上下文与记忆设计.md)。
+
 ### 3.3 输出契约
 
 结论定死 schema,禁止自由散文:
@@ -90,7 +92,7 @@
 | 4 | 三份 Schema | Working Memory / 输出契约 / 状态机契约(见第 3 节) | —— | ✅ 领域内核已落地 |
 | 5 | Triage 查询模板 | 当前 1 个非执行 template id；真实 SPL、更多粗查模板待领域配置与 MCP 契约 | #2、#3 | 🟡 QueryPlan 已落地；wire 模板待定 |
 | 6 | 护栏规则 | 查询预算、类型化查询 allowlist、ScopePolicy、结果摘要与脱敏 | #2(仅真实 wire 细节) | 🟡 查询计划护栏已落地；PII/结果策略与真实 Adapter 待定 |
-| 7 | 评估集 | 版本化历史 incident、证据标注、安全攻击集与可复现 manifest | —— | 🟡 契约已定义；数据集与 runner 待实现 |
+| 7 | 评估集 | 版本化历史 incident、证据标注、安全攻击集与可复现 manifest | —— | 🟡 严格 Loader/Fake harness 已落地；历史数据与完整 manifest 待补 |
 | 8 | 结构化模型边界 | 有界知识投影、证据别名、分阶段 Schema、有限重试 | #3、#6 | 🟡 provider-neutral + Fake 已落地；真实 provider/脱敏待接 |
 
 **依赖关系:** #1、#3、#7 可并行先启动；#2 只阻塞真实 Splunk Adapter、wire 查询模板、分页和 RBAC 验收，不阻塞领域 Schema、类型化查询计划与纯 Policy Gate。
@@ -156,11 +158,12 @@
 
 1. 落地领域 Schema、状态机、端口与 Agent loop 骨架
 2. 使用 Fake Adapter 跑通诊断闭环，并实现 ScopePolicy、QueryPlan 与 Policy Gate
-3. 接入严格领域知识快照，并保持它与执行权限隔离
-4. 接入 provider-neutral 结构化模型推理边界；生产 provider 必须与脱敏和评估集一起接入
-5. 按[第 7 章](07-真实适配器与脱敏边界.md)盘清 MCP/provider wire contract，并完成 Renderer、Sanitizer、RBAC、分页和取消验收
-6. 按[第 8 章](第8章-评估.md)建立可复现 incident 评估集、过程指标和发布门槛
-7. 按[第 9 章](第9章-AgentLoop骨架实现.md)建立安全入口、身份到 scope 的授权映射，以及幂等/恢复边界
-8. 按[第 10 章](第10章-可观测性与迭代.md)接入安全 Trace、指标和回放，并让线上发现回到离线评估
+3. 明确 WorkingMemory、模型上下文和长期记忆边界；保持状态机对记忆更新的唯一写权限
+4. 接入严格领域知识快照，并保持它与执行权限隔离
+5. 接入 provider-neutral 结构化模型推理边界；生产 provider 必须与脱敏和评估集一起接入
+6. 按[第 8 章](08-真实适配器与脱敏边界.md)盘清 MCP/provider wire contract，并完成 Renderer、Sanitizer、RBAC、分页和取消验收
+7. 按[第 9 章](09-评估与回归.md)建立可复现 incident 评估集、过程指标和发布门槛
+8. 按[第 10 章](10-AgentLoop装配与安全入口.md)建立安全入口、身份到 scope 的授权映射，以及幂等/恢复边界
+9. 按[第 11 章](11-可观测性与迭代.md)接入安全 Trace、指标和回放，并让线上发现回到离线评估
 
 主线阅读入口和每章准确完成状态见[教学文档 README](README.md)。

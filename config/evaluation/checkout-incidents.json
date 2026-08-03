@@ -1,0 +1,109 @@
+{
+  "schema_version": 1,
+  "dataset_id": "checkout-incident-baseline",
+  "revision": "2026-08-03.1",
+  "cases": [
+    {
+      "id": "payment-timeout-completed",
+      "request": {
+        "question": "Why did checkout requests fail during this window?",
+        "scope_ref": "checkout-prod",
+        "start": "2026-08-02T11:30:00Z",
+        "end": "2026-08-02T12:00:00Z"
+      },
+      "replay_fixture_id": "payment-timeout-v1",
+      "expected": {
+        "phase": "completed",
+        "termination_reason": "root_cause_identified",
+        "conclusion_outcome": "conclusive",
+        "root_cause_key": "payment_dependency_timeout",
+        "root_cause_summary": "Payment dependency timeouts caused checkout failures.",
+        "required_evidence_labels": [
+          "payment-timeout-before-checkout-failure"
+        ],
+        "failure_code": null
+      },
+      "tags": ["conclusive", "dependency"]
+    },
+    {
+      "id": "empty-window-inconclusive",
+      "request": {
+        "question": "Why did checkout requests fail during this window?",
+        "scope_ref": "checkout-prod",
+        "start": "2026-08-02T11:30:00Z",
+        "end": "2026-08-02T12:00:00Z"
+      },
+      "replay_fixture_id": "no-data-v1",
+      "expected": {
+        "phase": "inconclusive",
+        "termination_reason": "no_data",
+        "conclusion_outcome": "inconclusive",
+        "root_cause_key": null,
+        "root_cause_summary": null,
+        "required_evidence_labels": [],
+        "failure_code": null
+      },
+      "tags": ["honesty", "no-data"]
+    },
+    {
+      "id": "insufficient-evidence-inconclusive",
+      "request": {
+        "question": "Why did checkout requests fail during this window?",
+        "scope_ref": "checkout-prod",
+        "start": "2026-08-02T11:30:00Z",
+        "end": "2026-08-02T12:00:00Z"
+      },
+      "replay_fixture_id": "insufficient-v1",
+      "expected": {
+        "phase": "inconclusive",
+        "termination_reason": "insufficient_evidence",
+        "conclusion_outcome": "inconclusive",
+        "root_cause_key": null,
+        "root_cause_summary": null,
+        "required_evidence_labels": [],
+        "failure_code": null
+      },
+      "tags": ["honesty", "insufficient-evidence"]
+    },
+    {
+      "id": "query-budget-inconclusive",
+      "request": {
+        "question": "Why did checkout requests fail during this window?",
+        "scope_ref": "checkout-prod",
+        "start": "2026-08-02T11:30:00Z",
+        "end": "2026-08-02T12:00:00Z"
+      },
+      "replay_fixture_id": "budget-exhausted-v1",
+      "expected": {
+        "phase": "inconclusive",
+        "termination_reason": "query_budget_exhausted",
+        "conclusion_outcome": "inconclusive",
+        "root_cause_key": null,
+        "root_cause_summary": null,
+        "required_evidence_labels": [],
+        "failure_code": null
+      },
+      "tags": ["budget", "honesty"]
+    },
+    {
+      "id": "unknown-scope-failed",
+      "request": {
+        "question": "Why did checkout requests fail during this window?",
+        "scope_ref": "unknown-prod",
+        "start": "2026-08-02T11:30:00Z",
+        "end": "2026-08-02T12:00:00Z"
+      },
+      "replay_fixture_id": "unknown-scope-v1",
+      "expected": {
+        "phase": "failed",
+        "termination_reason": "operation_failed",
+        "conclusion_outcome": null,
+        "root_cause_key": null,
+        "root_cause_summary": null,
+        "required_evidence_labels": [],
+        "failure_code": "query_policy.unknown_scope"
+      },
+      "tags": ["policy", "security"]
+    }
+  ]
+}

@@ -2,7 +2,7 @@
 
 一个基于证据、显式状态机和端口适配器架构的日志诊断 Agent。
 
-当前已实现纯领域内核、应用端口、异步命令执行器、Fake 诊断闭环、ScopePolicy + 类型化 QueryPlan + Policy Gate 安全查询管线、严格 JSON 领域知识快照，以及有界知识投影和 provider-neutral 结构化推理 Adapter。Fake 模型已跑通完整闭环，但尚未连接真实 LLM 或 Splunk；生产日志在 Sanitizer/Redactor 和字段分类完成前禁止外发。
+当前已实现纯领域内核、应用端口、异步命令执行器、Fake 诊断闭环、ScopePolicy + 类型化 QueryPlan + Policy Gate 安全查询管线、严格 JSON 领域知识快照、有界知识投影、provider-neutral 结构化推理 Adapter，以及严格 incident Loader + deterministic Fake eval harness。Fake 模型与五类评估场景已跑通，但尚未连接真实 LLM 或 Splunk；生产日志在 Sanitizer/Redactor 和字段分类完成前禁止外发。
 
 ## 开发基线
 
@@ -30,10 +30,11 @@ ruff format --check .
 - [`doc/02-端口与适配器.md`](doc/02-端口与适配器.md)
 - [`doc/03-命令执行器与Fake闭环.md`](doc/03-命令执行器与Fake闭环.md)
 - [`doc/04-安全查询管线.md`](doc/04-安全查询管线.md)
-- [`doc/05-领域知识配置.md`](doc/05-领域知识配置.md)
-- [`doc/06-知识投影与结构化推理.md`](doc/06-知识投影与结构化推理.md)
-- [`doc/07-真实适配器与脱敏边界.md`](doc/07-真实适配器与脱敏边界.md)
-- [`doc/第8章-评估.md`](doc/第8章-评估.md)
-- [`doc/第9章-AgentLoop骨架实现.md`](doc/第9章-AgentLoop骨架实现.md)
-- [`doc/第10章-可观测性与迭代.md`](doc/第10章-可观测性与迭代.md)
+- [`doc/05-上下文与记忆设计.md`](doc/05-上下文与记忆设计.md)
+- [`doc/06-领域知识配置.md`](doc/06-领域知识配置.md)
+- [`doc/07-知识投影与结构化推理.md`](doc/07-知识投影与结构化推理.md)
+- [`doc/08-真实适配器与脱敏边界.md`](doc/08-真实适配器与脱敏边界.md)
+- [`doc/09-评估与回归.md`](doc/09-评估与回归.md)
+- [`doc/10-AgentLoop装配与安全入口.md`](doc/10-AgentLoop装配与安全入口.md)
+- [`doc/11-可观测性与迭代.md`](doc/11-可观测性与迭代.md)
 - [`doc/Capstone-迁移与扩展.md`](doc/Capstone-迁移与扩展.md)

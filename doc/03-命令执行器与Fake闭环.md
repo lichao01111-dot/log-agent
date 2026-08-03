@@ -22,6 +22,31 @@ sequenceDiagram
     Note over S: 只有 transition() 修改状态
 ```
 
+## 代码导读
+
+| 阅读目标 | 源码 | 对应测试 |
+|---|---|---|
+| Command 到 Event 的翻译、超时与协议校验 | [`application/executor.py`](../src/log_agent/application/executor.py) | [`test_executor.py`](../tests/unit/application/test_executor.py) |
+| 顺序驱动 `Command → Event → transition` | [`application/runner.py`](../src/log_agent/application/runner.py) | [`test_fake_investigation.py`](../tests/integration/test_fake_investigation.py) |
+| 搜索与推理 Fake | [`adapters/fakes.py`](../src/log_agent/adapters/fakes.py) | [`test_fake_investigation.py`](../tests/integration/test_fake_investigation.py) |
+| 状态机最终接纳或拒绝 Event | [`domain/state_machine.py`](../src/log_agent/domain/state_machine.py) | [`test_domain.py`](../tests/unit/test_domain.py) |
+
+建议先读 `InvestigationRunner.run()`：它只有一个很小的循环。再读 `CommandExecutor.execute()` 的超时和异常分支，最后分别进入 `_execute_query()`、`_generate_hypotheses()`、`_assess_verification()` 与 `_generate_conclusion()`。
+
+真实执行链如下：
+
+```text
+transition(...)
+  → CommandExecutor._require_current_command()  调用前校验
+  → CommandExecutor._dispatch()                 选择 Port
+  → Fake 或未来真实 Adapter
+  → CommandExecutor._validate_*()               调用后校验
+  → Event
+  → transition(...)                             领域层最终接纳
+```
+
+Fake 的价值在于替换外部不确定性，而不是替换生产逻辑。集成测试仍然使用真实的 `InvestigationRunner`、`CommandExecutor`、查询管线和状态机，所以能验证实际装配链，而不只是几个互不相连的 mock 调用。
+
 ## 四条翻译规则
 
 | Command | 调用的能力 | 返回的 Event |
@@ -103,8 +128,8 @@ NEW
 
 - `QueryIntent.goal` 仍是语义目标，不是 SPL；
 - scope/index 白名单和 Policy Gate 已在第四课补齐；
-- 第六课已补上 provider-neutral 模型结构化输出、严格校验与有限重试；
+- 第七课已补上 provider-neutral 模型结构化输出、严格校验与有限重试；
 - 还没有真实 Splunk MCP Adapter；
 - Runner 当前只负责从全新的 Investigation 顺序运行到终态。
 
-安全查询管线见第四课，结构化推理边界见第六课文档。
+安全查询管线见第四课，结构化推理边界见第七课文档。
